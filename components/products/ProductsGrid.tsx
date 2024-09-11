@@ -12,8 +12,8 @@ const ProductsGrid = ({products}:{products:Product[]}) => {
         const productId = product.id
         const formatPrice = formatePrice(price);
         return <article key={productId} className="group relative">
-          <FavoriteToggleButton className="absolute top-8 right-8 z-20" />
-          <FavoriteToggleButton className="absolute top-4 right-4" />
+          <FavoriteToggleButton productId={productId} className="absolute top-8 right-8 z-20" />
+          <FavoriteToggleButton productId={productId} className="absolute top-4 right-4" />
           <Link href={`/products/${productId}`}>
             <Card className="transform group-hover:shadow-xl transition-shadow duration-500">
               <CardContent className="p-4">
