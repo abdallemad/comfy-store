@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 // useSearch => use with client component.
 // searchParams => use with server component.
 import { useDebouncedCallback } from 'use-debounce';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const NavSearch = () => {
   const searchParams= useSearchParams();
@@ -17,11 +17,6 @@ const NavSearch = () => {
     else params.delete('search');
     replace(`/products?${params.toString()}`)
   },500)
-
-  useEffect(()=>{
-    if(!searchParams.get('search')) setSearch('') ;
-    
-  },[searchParams.get('search')])
   return (
     <Input
       type='search'
