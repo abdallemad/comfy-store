@@ -1,4 +1,4 @@
-'use client';
+// 'use client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +14,8 @@ import UserIcon from './UserIcon';
 import { SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/nextjs';
 import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu';
 import SingOutLink from './SingOutLink';
+import { auth } from '@clerk/nextjs/server';
+
 
 const LinksDropDown = () => {
   return <DropdownMenu>
@@ -40,8 +42,10 @@ const LinksDropDown = () => {
       {/* LINKS WHERE THERE IS USER */}
       <SignedIn>
         {links.map(link=>{
+          const isAdminUser = auth().userId === process.env.ADMIN_USER_ID;
+          if(!isAdminUser && link.label == 'dashboard') return null
           return <DropdownMenuItem key={link.href} asChild>
-            <Link href={link.href} className='w-full capitalize'>
+            <Link href={link.href} className='w-full capitalize font-medium'>
             {link.label}
           </Link>
           </DropdownMenuItem>

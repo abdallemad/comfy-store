@@ -13,9 +13,9 @@ const SingleProduct =async ({params}:{params:{id:string}}) => {
   return (
     <section >
       <Breadcrumbs productName={name} />
-      <div className="grid md:grid-cols-2 gap-y-8 lg:gap-x-16 mt-6">
+      <div className="grid md:grid-cols-2 gap-y-8 gap-8 lg:gap-x-16 mt-6">
         {/* REMOTE IMAGE */}
-        <div className="relative h-full">
+        <div className="relative h-full min-h-64 w-full">
           <Image 
             src={image} 
             alt={name}
