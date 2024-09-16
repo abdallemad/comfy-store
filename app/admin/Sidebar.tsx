@@ -11,7 +11,7 @@ const Sidebar = ({className}:{className?:string}) => {
     <aside className={cn(className)}>
       {adminLinks.map(link=>{
         const isActive = pathname === link.href
-        return <Button key={link.href} variant={isActive?'default':'ghost'} asChild className="w-full mb-2 capitalize font-normal">
+        return <Button key={link.href} variant={isActive?'default':'ghost'} asChild className="w-full mb-2 capitalize font-normal justify-start">
           <Link href={link.href}>{link.label}</Link>
         </Button>
       })}

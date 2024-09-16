@@ -5,7 +5,11 @@ const nextConfig = {
       {
         protocol:'https',
         hostname:'images.pexels.com',
-        // pathname:'/photos/**',
+        port:''
+      },
+      {
+        protocol:'https',
+        hostname:'atsthryexavsiiqazqlf.supabase.co',
         port:''
       }
     ]
