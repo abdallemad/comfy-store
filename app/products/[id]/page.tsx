@@ -1,12 +1,20 @@
 import Breadcrumbs from '@/components/single-products/Breadcrumbs';
-import { fetchSingleProduct } from '@/utils/actions';
+import { fetchSingleProduct,findExistingReview } from '@/utils/actions';
 import Image from 'next/image';
 import { formatePrice } from '@/utils/format';
 import FavoriteToggleButton from '@/components/products/FavoriteToggleButton';
 import AddToCart from '@/components/single-products/AddToCart';
 import ProductsRating from '@/components/single-products/ProductRating';
+import ShareButton from '@/components/single-products/ShareButton'
+import SubmitReview from '@/components/reviews/SubmitReview';
+import ProductReviews from '@/components/reviews/ProductReviews';
+import { auth } from '@clerk/nextjs/server';
+
 const SingleProduct =async ({params}:{params:{id:string}}) => {
   const {id:productId} = params
+  const {userId} = auth();
+  const isExist = userId && !(await findExistingReview(userId,productId))
+  // console.log(isExist);
   const product = await fetchSingleProduct({id:productId});
   const {name,image,price,company,description} = product;
   const dollarAmount = formatePrice(price);
@@ -28,7 +36,11 @@ const SingleProduct =async ({params}:{params:{id:string}}) => {
         <div>
           <div className="flex gap-x-8 items-center">
             <h1 className="capitalize text-3xl font-bold">{name}</h1>
-            <FavoriteToggleButton productId={productId} />
+            
+            <div className="flex gap-4 items-center">
+              <FavoriteToggleButton productId={productId} />
+              <ShareButton name={product.name} productId={params.id}/>
+            </div>
           </div>
           <ProductsRating productId={productId} />
           <h4 className="text-xl mt-2">{company}</h4>
@@ -37,6 +49,8 @@ const SingleProduct =async ({params}:{params:{id:string}}) => {
           <AddToCart  productId={productId} />
         </div>
       </div>
+      <ProductReviews productId={params.id}/>
+      {isExist && <SubmitReview productId={params.id} />}
     </section>
   )
 }
