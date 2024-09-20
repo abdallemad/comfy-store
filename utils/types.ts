@@ -3,7 +3,11 @@ export type actionFunction =(
   formData: FormData
 ) => Promise<{ message: string }>
 
+import { Prisma } from '@prisma/client';
 
+export type CartItemWithProduct = Prisma.CartItemGetPayload<{
+  include: { product: true };
+}>;
 
 export type CartItem = {
   productId: string;

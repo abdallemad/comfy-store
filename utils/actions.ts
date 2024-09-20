@@ -362,7 +362,10 @@ export const fetchOrCreateCart = async ({userId,errorOnFailure= false}:{userId:s
     where:{
       clerkId:userId,
     },
-    include:includeProductClause
+    include:includeProductClause,
+    orderBy:{
+
+    }
   })
   // console.log(cart)
   if(!cart && errorOnFailure) throw new Error('there is no cart')
@@ -408,6 +411,9 @@ export const updateCart = async (cart:Cart) => {
     },
     include:{
       product:true
+    },
+    orderBy:{
+      createdAt:'asc'
     }
   })
   let numItemsInCart = 0;
@@ -430,7 +436,7 @@ export const updateCart = async (cart:Cart) => {
       tax
     },include:includeProductClause
   })
-  return currentCart
+  return {currentCart,cartItems}
 };
 
 export const addToCartAction = async (prevState:any,formData:FormData) => {
@@ -448,10 +454,108 @@ export const addToCartAction = async (prevState:any,formData:FormData) => {
   redirect('/cart')
 };
 
-export const removeCartItemAction = async () => {};
+export const removeCartItemAction = async (prevState:any,formData:FormData) => {
+  const user = await getAuthUser();
+  try {
+    const cart = await fetchOrCreateCart({userId:user.id,errorOnFailure:true})
+    const id  = formData.get('id') as string
+    await db.cartItem.delete({
+      where:{
+        id:id,
+        cartId:cart.id,
+      }
+    })
+    await updateCart(cart)
+    revalidatePath('/cart');
+    return {message:'Item removed successfully'}
+  } catch (error) {
+    renderErrorObject(error)
+  }
+  return {message:'item removed!'}
+};
 
-export const updateCartItemAction = async () => {};
+export const updateCartItemAction = async ({amount,cartItemId}:{amount:number,cartItemId:string}) => {
+  const user =await getAuthUser();
+  try {
+    const cart = await fetchOrCreateCart({userId:user.id,errorOnFailure:true})
+    await db.cartItem.update({
+      where:{
+        cartId:cart.id,
+        id:cartItemId
+      },
+      data:{
+        amount
+      }
+    })
+    await updateCart(cart);
+    revalidatePath('/cart');
+    return {message:'cart updated'}
+  } catch (error) {
+    return renderErrorObject(error)
+  }
+};
 
 export const createOrderAction = async (prevState:any,formData:FormData)=>{
-  return {message:'order is placed'}
+  const user = await getAuthUser();
+  let orderId:(null | string)= null;
+  let cartId:(null | string) = null;
+
+  try {
+    const cart = await fetchOrCreateCart({userId:user.id,errorOnFailure:true});
+    cartId = cart.id
+
+    await db.order.deleteMany({
+      where:{
+        clerkId:user.id,
+        isPaid:false
+      }
+    })
+
+    const order = await db.order.create({
+      data:{
+        clerkId:user.id,
+        email:user.emailAddresses[0].emailAddress,
+        products:cart.numItemsInCart,
+        orderTotal:cart.orderTotal,
+        shipping: cart.shipping,
+        tax: cart.tax,
+      }
+    })
+
+    orderId = order.id
+
+    // await db.cart.delete({
+    //   where:{
+    //     id:cart.id,
+    //   }
+    // })
+
+  } catch (error) {
+    return renderErrorObject(error);
+  }
+  redirect(`/checkout?orderId=${orderId}&cartId=${cartId}`);
+}
+export const fetchUserOrders= async ()=>{
+  const user =await getAuthUser()
+  const orders = await db.order.findMany({
+    where:{
+      clerkId:user.id,
+      isPaid:true
+    },orderBy:{
+      createdAt:'asc'
+    }
+  })
+  return orders
+}
+export const fetchAdminOrders= async ()=>{
+  const user = await getAdminUser();
+  const orders = await db.order.findMany({
+    where:{
+      isPaid:true
+    },
+    orderBy:{
+      createdAt:'desc'
+    }
+  });
+  return orders;
 }

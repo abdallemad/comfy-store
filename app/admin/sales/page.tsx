@@ -1,9 +1,50 @@
-
-const SalesPage = () => {
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import SectionTitle from '@/components/global/SectionTitle';
+import { fetchAdminOrders } from '@/utils/actions';
+import { formatePrice, formatDate } from '@/utils/format';
+const SalesPage = async () => {
+  const orders = await fetchAdminOrders();
+  // if(orders.length == 0) return <SectionTitle text='Your Cart Is Empty' />
   return (
-    <div>
-      Sales page.
-    </div>
+    <>
+      <SectionTitle text='Your Sales' />
+      <Table>
+        <TableCaption>Total Sales: {orders.length}</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Email</TableHead>
+            <TableHead>Products</TableHead>
+            <TableHead>Order Total</TableHead>
+            <TableHead>Tax</TableHead>
+            <TableHead>Shipping</TableHead>
+            <TableHead>Date</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {
+            orders.map(order=>{
+              return <TableRow key={order.id}>
+                <TableCell>{order.email}</TableCell>
+                <TableCell>{order.products}</TableCell>
+                <TableCell>{formatePrice(order.orderTotal)}</TableCell>
+                <TableCell>{formatePrice(order.tax)}</TableCell>
+                <TableCell>{formatePrice(order.shipping)}</TableCell>
+                <TableCell>{formatePrice(order.shipping)}</TableCell>
+                <TableCell>{formatDate(order.createdAt)}</TableCell>
+              </TableRow>
+            })
+          }
+        </TableBody>
+      </Table>
+    </>
   )
 }
 

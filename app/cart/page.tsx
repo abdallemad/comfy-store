@@ -9,14 +9,14 @@ const CartPage = async () => {
   const {userId} = auth()
   if(!userId) redirect('/');
   const prevCart = await fetchOrCreateCart({userId})
-  const cart = await updateCart(prevCart);
+  const {currentCart:cart,cartItems} = await updateCart(prevCart);
   if(cart.numItemsInCart === 0) return <SectionTitle text='Your Cart Is Empty' />
   return (
     <>
       <SectionTitle text='Shopping Cart'/>
       <div className='mt-8 grid gap-4 lg:grid-cols-12'>
         <div className='lg:col-span-8'>
-          <CartItemsList cartItems={cart.cartItems}/>
+          <CartItemsList cartItems={cartItems}/>
         </div>
         <div className='lg:col-span-4'>
           <CartTotals cart={cart}/>
