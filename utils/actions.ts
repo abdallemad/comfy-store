@@ -1,12 +1,12 @@
 'use server';
-import db from './db'
-import { redirect } from 'next/navigation'
-import { auth, currentUser, getAuth } from '@clerk/nextjs/server';
-import { ZodError} from 'zod'
+import { auth, currentUser } from '@clerk/nextjs/server';
+import { Cart } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { ZodError } from 'zod';
+import db from './db';
 import { imageSchema, productSchema, reviewSchema, validateWithZodSchema, } from './Schemas';
 import { deleteImageFromSupabase, uploadImage } from './subapase';
-import { revalidatePath } from 'next/cache';
-import { Cart } from '@prisma/client';
 type ProductSchemaType ={
   name: string
     company:string
